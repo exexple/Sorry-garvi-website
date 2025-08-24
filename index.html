@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Floating Sorry Messages</title>
+  <style>
+    body, html {
+      margin:0; padding:0; height:100%; overflow:hidden;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      font-family: Arial, sans-serif;
+      display:flex; justify-content:center; align-items:center;
+    }.bubble {
+  position:absolute; padding:10px 20px; border-radius:50px;
+  background:rgba(255,107,107,0.3); color:white;
+  font-weight:bold; cursor:pointer; user-select:none; white-space:nowrap;
+  pointer-events:auto;
+  animation-name:float;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0px) scale(1); opacity:1; }
+  50% { transform: translateY(50vh) translateX(var(--drift)) scale(1.1); opacity:0.9; }
+  100% { transform: translateY(-150px) translateX(calc(var(--drift) * 1.5)) scale(0.8); opacity:0; }
+}
+
+  </style>
+</head>
+<body>
+  <script>
+    const messages = ['sorry', 'I\'m sorry', 'really sorry', 'my bad', 'pls forgive', 'so sorry', 'forgive me', 'I didn\'t mean it', 'sorry ♥'];
+    const bubbleCount = 40;function randomInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+function randomFloat(min, max){ return Math.random() * (max - min) + min; }
+
+function createBubble(){
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = messages[randomInt(0, messages.length-1)];
+  const size = randomInt(14, 28);
+  bubble.style.fontSize = size + 'px';
+  const left = randomInt(0, window.innerWidth - 100);
+  bubble.style.left = left + 'px';
+  const duration = randomFloat(8,15);
+  bubble.style.animationDuration = duration + 's';
+  const drift = randomInt(-100,100) + 'px';
+  bubble.style.setProperty('--drift', drift);
+
+  bubble.addEventListener('click', ()=>{
+    bubble.style.transition = 'transform 0.3s, opacity 0.3s';
+    bubble.style.transform += ' scale(0.2)';
+    bubble.style.opacity = 0;
+    setTimeout(()=>bubble.remove(),300);
+  });
+
+  document.body.appendChild(bubble);
+}
+
+for(let i=0;i<bubbleCount;i++){
+  setTimeout(createBubble, i*300); // stagger bubbles for better effect
+}
+
+// regenerate bubbles continuously
+setInterval(()=>{
+  if(document.body.querySelectorAll('.bubble').length < bubbleCount){
+    createBubble();
+  }
+}, 1000);
+
+// handle window resize to prevent bubbles from going offscreen
+window.addEventListener('resize', ()=>{
+  const bubbles = document.body.querySelectorAll('.bubble');
+  bubbles.forEach(bubble=>{
+    let left = parseInt(bubble.style.left);
+    if(left > window.innerWidth - 80){
+      bubble.style.left = (window.innerWidth - 100) + 'px';
+    }
+  });
+});
+
+  </script>
+</body>
+</html>
